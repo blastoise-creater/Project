@@ -1,0 +1,645 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>India Geography Project | Class 9th D</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;800&family=Fraunces:ital,opsz,wght@1,9..144,700&display=swap');
+
+        :root {
+            --primary: #1e40af;
+            --accent: #3b82f6;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --bg-dull: #f8fafc;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dull);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Enhanced Background --- */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 0% 0%, #eff6ff 0%, #f8fafc 100%);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10vw, 10vh) scale(1.2); }
+        }
+
+        /* --- Dynamic Resolution Container --- */
+        #app-scaler {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            display: flex;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
+        }
+
+        .slide-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            box-sizing: border-box;
+        }
+
+        /* --- Drawer Menu --- */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: -350px;
+            width: 320px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            box-shadow: 20px 0 60px rgba(0,0,0,0.05);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 60px 30px;
+        }
+
+        #sidebar.open { transform: translateX(350px); }
+
+        #menu-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1100;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+
+        #menu-btn:hover { transform: scale(1.05); }
+        #menu-btn span { width: 28px; height: 3px; background: var(--primary); border-radius: 2px; }
+        
+        /* --- Content Cards --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            box-shadow: 0 40px 120px rgba(15, 23, 42, 0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .image-side {
+            position: relative;
+            background: #cbd5e1;
+            overflow: hidden;
+        }
+
+        .image-side video, .image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .text-side {
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chapter-title {
+            font-family: 'Fraunces', serif;
+            font-size: 72px;
+            line-height: 1.1;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .nav-item:hover, .nav-item.active { background: #eff6ff; color: var(--primary); }
+
+        /* Quiz UI */
+        .option {
+            padding: 24px;
+            border: 2px solid #f1f5f9;
+            border-radius: 24px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .option:hover { border-color: var(--accent); background: #f8faff; transform: translateY(-2px); }
+        .option.correct { background: #dcfce7; border-color: #22c55e; color: #166534; }
+        .option.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+        /* Progress Bar */
+        #progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary);
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        /* Video Background for Cover */
+        .video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+            z-index: 1;
+        }
+
+        /* Final Nature Design */
+        .nature-final {
+            background: linear-gradient(135deg, #134e4a 0%, #064e3b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50% 0 50% 0;
+            animation: drift 10s linear infinite;
+            z-index: 1;
+        }
+        @keyframes drift {
+            from { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            to { transform: translateY(1100px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer">
+        <div class="orb w-96 h-96 bg-blue-400 top-[-10%] left-[-10%]"></div>
+        <div class="orb w-80 h-80 bg-indigo-300 bottom-[10%] right-[-5%]" style="animation-delay: -5s;"></div>
+    </div>
+    
+    <div id="progress"></div>
+
+    <!-- Audio Placeholder -->
+    <audio id="bg-audio" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="menu-btn" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+    </div>
+
+    <nav id="sidebar">
+        <h3 class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-8">Navigation</h3>
+        <div id="nav-links"></div>
+    </nav>
+
+    <div id="app-scaler">
+        <div class="slide-track" id="track">
+            
+            <!-- COVER -->
+            <section class="slide">
+                <div class="glass-panel !grid-cols-1 relative">
+                    <div class="video-bg">
+                        <video autoplay muted loop playsinline class="w-full h-full object-cover">
+                            <source src="https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-beautiful-mountain-range-2152-large.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay"></div>
+                    </div>
+                    <div class="z-10 flex flex-col justify-center items-center text-white px-20 text-center">
+                        <span class="px-6 py-2 bg-blue-600/30 backdrop-blur-md text-white border border-white/20 rounded-full text-sm font-bold tracking-widest mb-8">INTERDISCIPLINARY PROJECT 2024</span>
+                        <h1 class="chapter-title !text-white" style="font-size: 140px; text-shadow: 0 10px 30px rgba(0,0,0,0.3);">Geography of India</h1>
+                        <p class="text-3xl font-light opacity-90 mb-20">Exploring our Physical Landscape • Class 9th D</p>
+                        
+                        <!-- Contributors Box -->
+                        <div class="absolute bottom-20 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+                            <p class="text-xs uppercase tracking-widest font-bold mb-6 opacity-70">Research & Presentation Team</p>
+                            <div class="grid grid-cols-6 gap-4">
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Anshul</p></div>
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Tanishq Sagar</p></div>
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Arman Aahil</p></div>
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Affan Ahemad</p></div>
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Yask Kumar</p></div>
+                                <div class="px-4 border-r border-white/10 last:border-0"><p class="font-bold text-lg">Anandhu P.S.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- INTRO -->
+            <section class="slide">
+                <div class="glass-panel">
+                    <div class="text-side">
+                        <h1 class="chapter-title">The Masterplan</h1>
+                        <p class="text-2xl text-slate-600 leading-relaxed mb-6">
+                            India stands as a subcontinent of breathtaking contrasts, where ancient geological forces have crafted a landscape like no other. From the frozen peaks of the North to the tropical shores of the South, our geography dictates how we live, speak, and thrive.
+                        </p>
+                        <p class="text-lg text-slate-500">
+                            In this study, we bridge the gap between the soil and the soul of the nation, exploring how each landform supports the world's most vibrant civilization.
+                        </p>
+                    </div>
+                    <div class="image-side">
+                        <img src="https://images.unsplash.com/photo-1524492707947-2f851be43ad4?auto=format&fit=crop&q=80&w=1000" alt="Intro">
+                    </div>
+                </div>
+            </section>
+
+            <!-- REGIONS -->
+            <div id="regions-container" style="display: contents;"></div>
+
+            <!-- SUMMARY -->
+            <section class="slide">
+                <div class="glass-panel">
+                    <div class="text-side">
+                        <h1 class="chapter-title">The Future</h1>
+                        <p class="text-2xl text-slate-600 leading-relaxed">
+                            Our study concludes that India's physiographic diversity is its greatest economic and cultural asset. As we move forward, understanding these regions is vital for sustainable development and national unity.
+                        </p>
+                    </div>
+                    <div class="image-side bg-indigo-50 flex items-center justify-center">
+                        <h1 class="text-[200px] animate-bounce">🇮🇳</h1>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QUIZ -->
+            <section class="slide">
+                <div class="glass-panel !grid-cols-1">
+                    <div class="p-20 max-w-4xl mx-auto w-full">
+                        <h1 class="chapter-title text-center" style="font-size: 60px;">Knowledge Check</h1>
+                        <div id="quiz-ui" class="mt-12 bg-white p-12 rounded-[40px] shadow-sm border border-slate-100">
+                            <div class="flex justify-between items-center mb-8">
+                                <span id="q-count" class="px-4 py-1 bg-slate-100 rounded-full font-bold text-slate-500">Question 1/5</span>
+                                <button onclick="showHint()" class="text-blue-600 font-bold hover:underline">💡 Show Hint</button>
+                            </div>
+                            <h2 id="q-text" class="text-3xl font-bold mb-10 text-slate-800">Question loading...</h2>
+                            <p id="hint-box" class="mb-6 p-4 bg-yellow-50 text-yellow-800 rounded-2xl hidden italic"></p>
+                            <div id="q-options" class="grid grid-cols-1 gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- THANK YOU / FINAL -->
+            <section class="slide">
+                <div class="glass-panel !grid-cols-1 relative nature-final text-white text-center">
+                    <!-- Petal Animation Container -->
+                    <div id="petal-container"></div>
+                    
+                    <div class="z-10 flex flex-col justify-center items-center h-full px-20">
+                        <div class="mb-12">
+                            <svg class="w-32 h-32 mx-auto text-green-400 mb-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h1 class="chapter-title !text-white" style="font-size: 140px; margin-bottom: 0;">Dhanyavad</h1>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <p class="text-4xl font-extrabold text-green-300">Thank You For Your Time</p>
+                            <p class="text-2xl text-white/60 font-light max-w-2xl mx-auto">This project was a collaborative effort by the students of Class 9th D to celebrate the geographic majesty of our motherland.</p>
+                        </div>
+
+                        <div class="mt-20 flex gap-6">
+                            <button onclick="gotoSlide(0)" class="px-10 py-5 bg-white text-green-900 rounded-3xl font-extrabold shadow-2xl hover:scale-105 active:scale-95 transition-all">Restart Journey</button>
+                            <button onclick="window.print()" class="px-10 py-5 bg-green-700/50 backdrop-blur-xl border border-white/10 text-white rounded-3xl font-extrabold hover:bg-green-600/50 transition-all">Download Report</button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Branding -->
+                    <div class="absolute bottom-12 left-0 w-full text-center opacity-30 tracking-widest text-sm font-bold uppercase">
+                        Nature & Heritage • Educational Series 2024
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        const regions = [
+            {
+                name: "Himalayas",
+                tag: "Northern Giants",
+                intro: "The Great Himalayas stand as the silent sentinels of India, forming an arc of 2,400 km. These mountains are not just rocks, but the birthplaces of sacred rivers and ancient cultures. They separate the Indian subcontinent from the vast Tibetan plateau with unmatched majesty.",
+                desc: "The youngest and highest fold mountain range in the world.",
+                bullets: [
+                    "Acts as a climatic divide preventing cold Central Asian winds.",
+                    "Perennial water source for the Indo-Gangetic plains.",
+                    "Rich in medicinal herbs and high-altitude biodiversity."
+                ],
+                lang: "Hindi, Pahari, Tibetan, Dogri.",
+                img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b"
+            },
+            {
+                name: "Godavari Basin",
+                tag: "The Southern Ganga",
+                intro: "Stretching across the Deccan, the Godavari is the lifeline of Central and Southern India. As the second longest river in the country, it creates fertile deltas that have supported civilizations for millennia. It is deeply woven into the spiritual and agricultural fabric of the region.",
+                desc: "The largest peninsular river, often called 'Dakshin Ganga'.",
+                bullets: [
+                    "Vital for the 'Rice Bowl of India' delta regions.",
+                    "Supports major hydroelectric projects like Pochampad.",
+                    "Host to the massive Pushkaram festivals every 12 years."
+                ],
+                lang: "Telugu, Marathi, Odia.",
+                img: "https://images.unsplash.com/photo-1581791538302-03537b9c97bf"
+            },
+            {
+                name: "Rann of Kutch",
+                tag: "The White Desert",
+                intro: "Located in the state of Gujarat, the Rann of Kutch is a surreal landscape that disappears underwater during monsoons. In the dry season, it transforms into a crystalline salt desert that glows under the moonlight. It is a land of extreme conditions and incredible craftsmanship.",
+                desc: "One of the world's largest salt marshes in the Thar Desert.",
+                bullets: [
+                    "World's only nesting ground for the Lesser Flamingo.",
+                    "Produces nearly 75% of India's total salt requirement.",
+                    "Home to the unique 'Bunga' architecture designed for earthquakes."
+                ],
+                lang: "Gujarati, Kutchi, Sindhi.",
+                img: "https://images.unsplash.com/photo-1623864504128-090bc678ec0f"
+            },
+            {
+                name: "Kangra Valley",
+                tag: "Land of the Gods",
+                intro: "Cradled in the shadows of the Dhauladhar range, the Kangra Valley is a mosaic of green tea estates and pine forests. Known for its pleasant weather and artistic heritage, it remains one of the most serene valleys in the Himalayas. It is a center for both spiritual peace and adventure.",
+                desc: "A lush, fertile valley in Himachal Pradesh famous for its beauty.",
+                bullets: [
+                    "Famous for Kangra Miniature paintings and tea cultivation.",
+                    "Home to the Masroor Rock Cut Temples (Ellora of the North).",
+                    "A critical hub for Himalayan tourism and paragliding."
+                ],
+                lang: "Kangri, Hindi, Gaddi.",
+                img: "https://images.unsplash.com/photo-1595055531512-32b0a6860361"
+            },
+            {
+                name: "Andaman & Nicobar",
+                tag: "Island Frontiers",
+                intro: "Deep in the Bay of Bengal lies an archipelago of 572 islands, where ancient tribal cultures meet pristine coral reefs. These islands are the gateway to the Indian Ocean and house some of the world's most untouched rainforests. They represent India's maritime strength and natural beauty.",
+                desc: "Strategic island chain with unique marine ecosystems.",
+                bullets: [
+                    "Features India's only active volcano on Barren Island.",
+                    "Crucial for monitoring Indian Ocean trade routes.",
+                    "Protected home to the Sentinelese and Jarawa tribes."
+                ],
+                lang: "Bengali, Tamil, Hindi, Nicobarese.",
+                img: "https://images.unsplash.com/photo-1589136140230-27222d90ca94"
+            },
+            {
+                name: "Deccan Plateau",
+                tag: "Volcanic Heartland",
+                intro: "Formed millions of years ago by volcanic eruptions, the Deccan Plateau is a rugged upland of black basalt rock. It tilts gently eastward, guiding all major southern rivers toward the sea. Its fertile 'Regur' soil has made it the backbone of India's textile industry.",
+                desc: "A massive triangular plateau covering most of South India.",
+                bullets: [
+                    "High cotton productivity due to moisture-retentive black soil.",
+                    "Extremely rich in minerals like gold, coal, and iron ore.",
+                    "Historical center of the Vijayanagara and Maratha empires."
+                ],
+                lang: "Kannada, Marathi, Telugu, Tamil.",
+                img: "https://images.unsplash.com/photo-1548013146-72479768bbaa"
+            }
+        ];
+
+        // 1. Resolution Scaling Engine
+        function rescale() {
+            const app = document.getElementById('app-scaler');
+            const refW = 1920;
+            const refH = 1080;
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            
+            const scale = Math.min(winW / refW, winH / refH);
+            app.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        }
+        window.addEventListener('resize', rescale);
+        rescale();
+
+        // 2. Render Content
+        const container = document.getElementById('regions-container');
+        const navLinks = document.getElementById('nav-links');
+        const chapterNames = ["Start", "Intro", ...regions.map(r => r.name), "Summary", "Quiz", "Thank You"];
+        
+        chapterNames.forEach((name, i) => {
+            const div = document.createElement('div');
+            div.className = 'nav-item';
+            div.innerHTML = `<span class="text-xs mr-3 opacity-50">${String(i+1).padStart(2,'0')}</span> ${name}`;
+            div.onclick = () => gotoSlide(i);
+            navLinks.appendChild(div);
+        });
+
+        regions.forEach((r, idx) => {
+            const section = document.createElement('section');
+            section.className = 'slide';
+            section.innerHTML = `
+                <div class="glass-panel">
+                    <div class="image-side">
+                        <img src="${r.img}?auto=format&fit=crop&q=80&w=1200" alt="${r.name}" loading="lazy">
+                    </div>
+                    <div class="text-side">
+                        <span class="text-blue-500 font-extrabold uppercase tracking-[0.2em] text-sm mb-4">${r.tag}</span>
+                        <h1 class="chapter-title">${r.name}</h1>
+                        <p class="text-xl text-slate-600 mb-8 leading-relaxed">${r.intro}</p>
+                        
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="p-6 bg-blue-50/50 rounded-3xl border border-blue-100">
+                                <h4 class="font-bold text-blue-700 mb-3 text-lg flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    Quick Facts
+                                </h4>
+                                <ul class="space-y-2 text-slate-700 font-medium">
+                                    ${r.bullets.map(b => `<li>• ${b}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                <h4 class="font-bold text-slate-500 mb-1 text-sm uppercase tracking-wider">Linguistic Diversity</h4>
+                                <p class="text-slate-700 font-semibold">${r.lang}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(section);
+        });
+
+        // 3. Navigation Engine
+        let currentSlide = 0;
+        const totalSlides = chapterNames.length;
+        const track = document.getElementById('track');
+
+        function gotoSlide(n) {
+            if (n < 0 || n >= totalSlides) return;
+            currentSlide = n;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.getElementById('progress').style.width = `${(currentSlide / (totalSlides - 1)) * 100}%`;
+            
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach((item, i) => item.classList.toggle('active', i === currentSlide));
+            if (document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
+
+            // Try to play audio on first navigation
+            const audio = document.getElementById('bg-audio');
+            if (audio && audio.paused) {
+                audio.play().catch(e => console.log("User interaction required for audio"));
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        let isMoving = false;
+        window.addEventListener('wheel', (e) => {
+            if (isMoving || Math.abs(e.deltaY) < 30) return;
+            isMoving = true;
+            if (e.deltaY > 0) gotoSlide(currentSlide + 1);
+            else gotoSlide(currentSlide - 1);
+            setTimeout(() => isMoving = false, 800);
+        }, { passive: true });
+
+        let startX = 0;
+        window.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
+        window.addEventListener('touchend', e => {
+            const endX = e.changedTouches[0].clientX;
+            if (startX - endX > 80) gotoSlide(currentSlide + 1);
+            else if (startX - endX < -80) gotoSlide(currentSlide - 1);
+        }, { passive: true });
+
+        // 4. Quiz Logic
+        const quizData = [
+            { q: "Which region acts as a natural barrier to cold Arctic winds?", o: ["Deccan Plateau", "Himalayas", "Andaman Islands"], c: 1, hint: "It is the world's highest mountain range." },
+            { q: "The Godavari River is popularly known by what spiritual name?", o: ["Dakshin Ganga", "Uttar Yamuna", "Paschim Narmada"], c: 0, hint: "It shares its name with North India's most holy river." },
+            { q: "Which soil type makes the Deccan Plateau ideal for cotton?", o: ["Sandy Desert Soil", "Regur (Black) Soil", "Laterite Soil"], c: 1, hint: "It is often called volcanic soil." },
+            { q: "Where is India's only active volcano located?", o: ["Barren Island", "Kaveri Basin", "Mount Everest"], c: 0, hint: "It is part of the Andaman archipelago." },
+            { q: "The 'Rann Utsav' is celebrated in which physiographic region?", o: ["Himalayas", "Kangra Valley", "Rann of Kutch"], c: 2, hint: "It is a white salt marsh in Gujarat." }
+        ];
+        let qIdx = 0;
+
+        function renderQuiz() {
+            const data = quizData[qIdx];
+            document.getElementById('q-text').innerText = data.q;
+            document.getElementById('q-count').innerText = `Question ${qIdx + 1}/5`;
+            document.getElementById('hint-box').classList.add('hidden');
+            
+            const optCont = document.getElementById('q-options');
+            optCont.innerHTML = '';
+            data.o.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerText = opt;
+                div.onclick = () => {
+                    if (i === data.c) {
+                        div.classList.add('correct');
+                        setTimeout(() => {
+                            if (qIdx < quizData.length - 1) { qIdx++; renderQuiz(); }
+                            else { gotoSlide(totalSlides - 1); }
+                        }, 800);
+                    } else {
+                        div.classList.add('wrong');
+                    }
+                };
+                optCont.appendChild(div);
+            });
+        }
+
+        function showHint() {
+            const box = document.getElementById('hint-box');
+            box.innerText = quizData[qIdx].hint;
+            box.classList.toggle('hidden');
+        }
+
+        // Petal Creation
+        function createPetals() {
+            const container = document.getElementById('petal-container');
+            for(let i=0; i<30; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.width = (Math.random() * 20 + 10) + 'px';
+                petal.style.height = petal.style.width;
+                petal.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                petal.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(petal);
+            }
+        }
+
+        window.onload = () => {
+            gotoSlide(0);
+            renderQuiz();
+            createPetals();
+        };
+    </script>
+</body>
+</html>
+
+```
